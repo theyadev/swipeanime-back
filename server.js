@@ -23,19 +23,6 @@ const io = require("socket.io")(server, {
   },
 });
 
-
-/*let map = jsonToMap(fs.readFileSync("./lists/Theya.json", "utf-8"));
-map[Symbol.iterator] = function* () {
-  yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
-};
-
-for (let [key, value] of map) {
-  // get data sorted
-  console.log(key + " " + value);
-}
-
-console.log([...map]);*/
-
 function mapToJson(map) {
   return JSON.stringify([...map]);
 }
@@ -56,19 +43,37 @@ io.on("connection", function (socket) {
   socket.on("INIT", function (data) {
     const x = new Map();
     data.list.forEach((e) => {
-      x.set(e.media.title.romaji, { pts: 0, times:0 });
+      x.set(e.media.title.romaji, { pts: 0, times: 0 });
     });
-    fs.writeFileSync("./lists/" + data.of + ".json", mapToJson(x));
+    fs.writeFileSync(
+      "./lists/" + data.of.toLowerCase() + ".json",
+      mapToJson(x)
+    );
   });
 
   socket.on("CHOOSE", function (data) {
-    let x = jsonToMap(fs.readFileSync("./lists/" + data.by + ".json", "utf-8"));
+    let x = jsonToMap(
+      fs.readFileSync("./lists/" + data.by.toLowerCase() + ".json", "utf-8")
+    );
     console.log("Choisis: " + data.choisis);
     console.log("Contre: " + data.refus);
-    x.get(data.choisis).pts++
-    x.get(data.choisis).times++
-    x.get(data.refus).times++
-    fs.writeFileSync("./lists/" + data.by + ".json", mapToJson(x));
+    x.get(data.choisis).pts++;
+    x.get(data.choisis).times++;
+    x.get(data.refus).times++;
+    fs.writeFileSync(
+      "./lists/" + data.by.toLowerCase() + ".json",
+      mapToJson(x)
+    );
     io.to(socket.id).emit("OK");
+  });
+
+  socket.on("GET", function (data) {
+    console.log(data.of);
+    let x = fs.readFileSync(
+      "./lists/" + data.of.toLowerCase() + ".json",
+      "utf-8"
+    );
+
+    io.to(socket.id).emit("GET", JSON.parse(x));
   });
 });
