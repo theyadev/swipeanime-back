@@ -23,10 +23,6 @@ const io = require("socket.io")(server, {
   },
 });
 
-/*
-PREMIUM:
--- HISTORIQUE
--- RETOUR ARRIERE */
 
 /*let map = jsonToMap(fs.readFileSync("./lists/Theya.json", "utf-8"));
 map[Symbol.iterator] = function* () {
