@@ -41,6 +41,8 @@ io.on("connection", function (socket) {
   });
 
   socket.on("INIT", function (data) {
+    const folder = fs.readdirSync("./lists");
+    if (folder.includes(data.of.toLowerCase() + ".json")) return
     const x = new Map();
     data.list.forEach((e) => {
       x.set(e.media.title.romaji, { pts: 0, times: 0 });
