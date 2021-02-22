@@ -42,10 +42,10 @@ io.on("connection", function (socket) {
 
   socket.on("INIT", function (data) {
     const folder = fs.readdirSync("./lists");
-    if (folder.includes(data.of.toLowerCase() + ".json")) return
+    if (folder.includes(data.of.toLowerCase() + ".json")) return;
     const x = new Map();
     data.list.forEach((e) => {
-      x.set(e.media.title.romaji, { pts: 0, times: 0 });
+      x.set(e.media.title.romaji, { pts: 0, times: 0, history: [] });
     });
     fs.writeFileSync(
       "./lists/" + data.of.toLowerCase() + ".json",
@@ -61,7 +61,10 @@ io.on("connection", function (socket) {
     console.log("Contre: " + data.refus);
     x.get(data.choisis).pts++;
     x.get(data.choisis).times++;
+    x.get(data.choisis).history.push({ c: data.choisis, r: data.refus });
+
     x.get(data.refus).times++;
+    x.get(data.refus).history.push({ c: data.choisis, r: data.refus });
     fs.writeFileSync(
       "./lists/" + data.by.toLowerCase() + ".json",
       mapToJson(x)
