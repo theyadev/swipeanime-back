@@ -41,6 +41,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on("INIT", function (data) {
+    console.log("INIT!");
     const folder = fs.readdirSync("./lists");
     if (folder.includes(data.of.toLowerCase() + ".json")) return;
     const x = new Map();
@@ -61,10 +62,18 @@ io.on("connection", function (socket) {
     console.log("Contre: " + data.refus);
     x.get(data.choisis).pts++;
     x.get(data.choisis).times++;
-    x.get(data.choisis).history.push({ c: data.choisis, r: data.refus });
+    x.get(data.choisis).history.unshift({
+      c: data.choisis,
+      r: data.refus,
+      date: new Date(),
+    });
 
     x.get(data.refus).times++;
-    x.get(data.refus).history.push({ c: data.choisis, r: data.refus });
+    x.get(data.refus).history.unshift({
+      c: data.choisis,
+      r: data.refus,
+      date: new Date(),
+    });
     fs.writeFileSync(
       "./lists/" + data.by.toLowerCase() + ".json",
       mapToJson(x)
@@ -80,5 +89,9 @@ io.on("connection", function (socket) {
     );
 
     io.to(socket.id).emit("GET", JSON.parse(x));
+  });
+  socket.on("RESET", function (data) {
+    console.log("RESET " + data.of);
+    fs.rmSync("./lists/" + data.of.toLowerCase() + ".json");
   });
 });
