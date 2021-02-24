@@ -81,6 +81,19 @@ io.on("connection", function (socket) {
     io.to(socket.id).emit("OK");
   });
 
+  socket.on("BLACKLIST", function (data) {
+    let x = jsonToMap(
+      fs.readFileSync("./lists/" + data.of.toLowerCase() + ".json", "utf-8")
+    );
+    x.get(data.anime).blacklist = data.state;
+    fs.writeFileSync(
+      "./lists/" + data.of.toLowerCase() + ".json",
+      mapToJson(x)
+    );
+    io.to(socket.id).emit("GET", JSON.parse(mapToJson(x)));
+    io.to(socket.id).emit("OK");
+  });
+
   socket.on("GET", function (data) {
     console.log(data.of);
     let x = fs.readFileSync(
