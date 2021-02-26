@@ -95,7 +95,9 @@ io.on("connection", function (socket) {
   });
 
   socket.on("GET", function (data) {
-    console.log(data.of);
+    const folder = fs.readdirSync("./lists");
+    if (!folder.includes(data.of.toLowerCase() + ".json"))
+      return io.to(socket.id).emit("GET", null);
     let x = fs.readFileSync(
       "./lists/" + data.of.toLowerCase() + ".json",
       "utf-8"
